@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model cat_servicios {
+  id              Int               @id @default(autoincrement())
+  nombre          String?           @db.VarChar(256)
+  costo           Decimal?          @db.Money
+  servicio_ticket servicio_ticket[]
+}
+
+model cat_ticket {
+  id        Int      @id @default(autoincrement())
+  nombre    String?  @db.VarChar(256)
+  costohora Decimal? @db.Money
+  ticket    ticket[]
+}
+
+model servicio_ticket {
+  idticket      Int
+  idcatservicio Int
+  includepay    Boolean?      @default(false)
+  cat_servicios cat_servicios @relation(fields: [idcatservicio], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_servicioticket_servicio")
+  ticket        ticket        @relation(fields: [idticket], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_servicioticket_ticket")
+
+  @@id([idticket, idcatservicio])
+}
+
+model ticket {
+  id              Int               @id @default(autoincrement())
+  fechainicio     DateTime?         @default(now()) @db.Timestamptz(6)
+  fechafinal      DateTime?         @db.Timestamptz(6)
+  nombre          String?           @db.VarChar(255)
+  idcatticket     Int?
+  total           Decimal?          @db.Money
+  uuidsearch      String            @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  servicio_ticket servicio_ticket[]
+  cat_ticket      cat_ticket?       @relation(fields: [idcatticket], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ticket_catticket")
+}

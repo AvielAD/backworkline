@@ -174,7 +174,9 @@ const totalCostTime = (inicio, fin, costohora) => {
         totalresponse = 0;
     else if (minutos > 240)
         totalresponse = costohora * 4;
-    else if (minutos > 60 && minutos < 240)
+    else if (minutos >= 10 && minutos <= 60)
+        totalresponse = costohora;
+    else if (minutos > 60 && minutos <= 240)
         totalresponse = costohora + ((costohora / minutos) * (minutos - 60));
     return parseFloat((Math.round(totalresponse * 100) / 100).toFixed(0));
 };

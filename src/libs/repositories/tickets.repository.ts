@@ -22,8 +22,8 @@ export const GetTickets = async () => {
             tickets.push({
                 id: item.id,
                 fechainicio: item.fechainicio,
-                fechafinal: item.fechafinal,
                 nombre: item.nombre,
+                uuid: item.uuidsearch,
                 category: {
                     id: item.cat_ticket?.id,
                     nombre: item.cat_ticket?.nombre

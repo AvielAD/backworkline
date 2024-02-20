@@ -32,8 +32,8 @@ const GetTickets = () => __awaiter(void 0, void 0, void 0, function* () {
             tickets.push({
                 id: item.id,
                 fechainicio: item.fechainicio,
-                fechafinal: item.fechafinal,
                 nombre: item.nombre,
+                uuid: item.uuidsearch,
                 category: {
                     id: (_a = item.cat_ticket) === null || _a === void 0 ? void 0 : _a.id,
                     nombre: (_b = item.cat_ticket) === null || _b === void 0 ? void 0 : _b.nombre

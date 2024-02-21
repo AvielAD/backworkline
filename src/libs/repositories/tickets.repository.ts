@@ -19,12 +19,10 @@ export const GetTickets = async () => {
         //calcular total consumido en servicios
 
         ticketsresponse.forEach((item, index) => {
-            const dateinicio = moment(item.fechainicio)
-            const fechainicio = moment.tz(dateinicio, 'America/Mexico_City').format(process.env.FORMAT_DATE)
     
             tickets.push({
                 id: item.id,
-                fechainicio: fechainicio,
+                fechainicio: moment(item.fechainicio).format("YYYY-MM-DD HH:mm:ss"),
                 nombre: item.nombre,
                 uuid: item.uuidsearch,
                 category: {
@@ -65,17 +63,13 @@ export const GetTicketByUUID = async(uuidSearch: string)=>{
                 includepay: item.includepay
             } as ServicioDto)
         })
-        const dateiniciostring = moment(ticket?.fechainicio)
-        const datefinstring = moment(ticket?.fechafinal)
+        const dateiniciostring = moment(ticket?.fechainicio).format("YYYY-MM-DD HH:mm:ss")
+        const datefinstring = moment(ticket?.fechafinal).format("YYYY-MM-DD HH:mm:ss")
         
-        const fechainicio = moment.tz(dateiniciostring, 'America/Mexico_City').format(process.env.FORMAT_DATE)
-        const fechafin = moment.tz(datefinstring, 'America/Mexico_City').format(process.env.FORMAT_DATE)
-        //America/Mexico_City
-
         let ticketresponse = {
             id : ticket?.id,
-            fechainicio : fechainicio,
-            fechafinal: fechafin,
+            fechainicio : dateiniciostring,
+            fechafinal: datefinstring,
             nombre: ticket?.nombre,
             uuid: uuidSearch,
             total: parseFloat( ticket?.total?.toString() ?? "0") ,

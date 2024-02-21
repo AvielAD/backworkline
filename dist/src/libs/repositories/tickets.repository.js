@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CerrarTicket = exports.IniciarTicker = exports.GetTicketByUUID = exports.GetTickets = void 0;
 const client_1 = require("@prisma/client");
-const moment_1 = __importDefault(require("moment"));
+const moment_timezone_1 = __importDefault(require("moment-timezone"));
 const prisma = new client_1.PrismaClient();
 const GetTickets = () => __awaiter(void 0, void 0, void 0, function* () {
     let tickets = [];
@@ -31,7 +31,7 @@ const GetTickets = () => __awaiter(void 0, void 0, void 0, function* () {
             var _a, _b;
             tickets.push({
                 id: item.id,
-                fechainicio: item.fechainicio,
+                fechainicio: (0, moment_timezone_1.default)(item.fechainicio).format(process.env.FORMAT_DATE),
                 nombre: item.nombre,
                 uuid: item.uuidsearch,
                 category: {
@@ -72,10 +72,13 @@ const GetTicketByUUID = (uuidSearch) => __awaiter(void 0, void 0, void 0, functi
                 includepay: item.includepay
             });
         });
+        const dateiniciostring = (0, moment_timezone_1.default)(ticket === null || ticket === void 0 ? void 0 : ticket.fechainicio).format(process.env.FORMAT_DATE);
+        const datefinstring = (0, moment_timezone_1.default)(ticket === null || ticket === void 0 ? void 0 : ticket.fechafinal).format(process.env.FORMAT_DATE);
+        //America/Mexico_City
         let ticketresponse = {
             id: ticket === null || ticket === void 0 ? void 0 : ticket.id,
-            fechainicio: ticket === null || ticket === void 0 ? void 0 : ticket.fechainicio,
-            fechafinal: ticket === null || ticket === void 0 ? void 0 : ticket.fechafinal,
+            fechainicio: dateiniciostring.toString(),
+            fechafinal: datefinstring.toString(),
             nombre: ticket === null || ticket === void 0 ? void 0 : ticket.nombre,
             uuid: uuidSearch,
             total: parseFloat((_b = (_a = ticket === null || ticket === void 0 ? void 0 : ticket.total) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : "0"),
@@ -132,7 +135,7 @@ const CerrarTicket = (uuid) => __awaiter(void 0, void 0, void 0, function* () {
                 includepay: item.includepay
             });
         });
-        const fechaCierre = (0, moment_1.default)().toDate();
+        const fechaCierre = (0, moment_timezone_1.default)().toDate();
         //calcular costo tiempo
         if ((ticket === null || ticket === void 0 ? void 0 : ticket.fechainicio) != null)
             costotiempo = totalCostTime(ticket.fechainicio, fechaCierre, parseFloat((_f = (_e = (_d = ticket.cat_ticket) === null || _d === void 0 ? void 0 : _d.costohora) === null || _e === void 0 ? void 0 : _e.toString()) !== null && _f !== void 0 ? _f : "0"));
@@ -166,9 +169,9 @@ const totalCostServices = (services) => {
 };
 const totalCostTime = (inicio, fin, costohora) => {
     let totalresponse = 0;
-    const start = (0, moment_1.default)(inicio);
-    const end = (0, moment_1.default)(fin);
-    const tiempototalm = moment_1.default.duration(end.diff(start));
+    const start = (0, moment_timezone_1.default)(inicio);
+    const end = (0, moment_timezone_1.default)(fin);
+    const tiempototalm = moment_timezone_1.default.duration(end.diff(start));
     const minutos = tiempototalm.asMinutes();
     if (minutos < 10)
         totalresponse = 0;

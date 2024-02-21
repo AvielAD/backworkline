@@ -62,15 +62,17 @@ export const GetTicketByUUID = async(uuidSearch: string)=>{
                 includepay: item.includepay
             } as ServicioDto)
         })
-        const dateiniciostring = moment(ticket?.fechainicio).format(process.env.FORMAT_DATE)
-        const datefinstring = moment(ticket?.fechafinal).format(process.env.FORMAT_DATE)
+        const dateiniciostring = moment(ticket?.fechainicio)
+        const datefinstring = moment(ticket?.fechafinal)
         
+        const fechainicio = moment.tz(dateiniciostring, 'America/Mexico_City').format(process.env.FORMAT_DATE)
+        const fechafin = moment.tz(datefinstring, 'America/Mexico_City').format(process.env.FORMAT_DATE)
         //America/Mexico_City
 
         let ticketresponse = {
             id : ticket?.id,
-            fechainicio : dateiniciostring.toString(),
-            fechafinal: datefinstring.toString(),
+            fechainicio : fechainicio,
+            fechafinal: fechafin,
             nombre: ticket?.nombre,
             uuid: uuidSearch,
             total: parseFloat( ticket?.total?.toString() ?? "0") ,

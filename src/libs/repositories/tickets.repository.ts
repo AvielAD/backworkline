@@ -22,7 +22,7 @@ export const GetTickets = async () => {
     
             tickets.push({
                 id: item.id,
-                fechainicio: moment(item.fechainicio).format("YYYY-MM-DD HH:mm:ss"),
+                fechainicio: moment.tz(item.fechainicio, "America/Mexico_City").format("YYYY-MM-DD HH:mm:ss"),
                 nombre: item.nombre,
                 uuid: item.uuidsearch,
                 category: {
@@ -63,8 +63,8 @@ export const GetTicketByUUID = async(uuidSearch: string)=>{
                 includepay: item.includepay
             } as ServicioDto)
         })
-        const dateiniciostring = moment(ticket?.fechainicio).format("YYYY-MM-DD HH:mm:ss")
-        const datefinstring = moment(ticket?.fechafinal).format("YYYY-MM-DD HH:mm:ss")
+        const dateiniciostring = moment.tz(ticket?.fechainicio, "America/Mexico_City").format("YYYY-MM-DD HH:mm:ss")
+        const datefinstring = moment.tz(ticket?.fechafinal, "America/Mexico_City").format("YYYY-MM-DD HH:mm:ss")
         
         let ticketresponse = {
             id : ticket?.id,

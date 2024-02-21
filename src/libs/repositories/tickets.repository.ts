@@ -19,9 +19,12 @@ export const GetTickets = async () => {
         //calcular total consumido en servicios
 
         ticketsresponse.forEach((item, index) => {
+            const dateinicio = moment(item.fechainicio)
+            const fechainicio = moment.tz(dateinicio, 'America/Mexico_City').format(process.env.FORMAT_DATE)
+    
             tickets.push({
                 id: item.id,
-                fechainicio: moment(item.fechainicio).format(process.env.FORMAT_DATE),
+                fechainicio: fechainicio,
                 nombre: item.nombre,
                 uuid: item.uuidsearch,
                 category: {

@@ -29,11 +29,9 @@ const GetTickets = () => __awaiter(void 0, void 0, void 0, function* () {
         //calcular total consumido en servicios
         ticketsresponse.forEach((item, index) => {
             var _a, _b;
-            const dateinicio = (0, moment_timezone_1.default)(item.fechainicio);
-            const fechainicio = moment_timezone_1.default.tz(dateinicio, 'America/Mexico_City').format(process.env.FORMAT_DATE);
             tickets.push({
                 id: item.id,
-                fechainicio: fechainicio,
+                fechainicio: moment_timezone_1.default.tz(item.fechainicio, "America/Mexico_City").format("YYYY-MM-DD HH:mm:ss"),
                 nombre: item.nombre,
                 uuid: item.uuidsearch,
                 category: {
@@ -74,15 +72,12 @@ const GetTicketByUUID = (uuidSearch) => __awaiter(void 0, void 0, void 0, functi
                 includepay: item.includepay
             });
         });
-        const dateiniciostring = (0, moment_timezone_1.default)(ticket === null || ticket === void 0 ? void 0 : ticket.fechainicio);
-        const datefinstring = (0, moment_timezone_1.default)(ticket === null || ticket === void 0 ? void 0 : ticket.fechafinal);
-        const fechainicio = moment_timezone_1.default.tz(dateiniciostring, 'America/Mexico_City').format(process.env.FORMAT_DATE);
-        const fechafin = moment_timezone_1.default.tz(datefinstring, 'America/Mexico_City').format(process.env.FORMAT_DATE);
-        //America/Mexico_City
+        const dateiniciostring = moment_timezone_1.default.tz(ticket === null || ticket === void 0 ? void 0 : ticket.fechainicio, "America/Mexico_City").format("YYYY-MM-DD HH:mm:ss");
+        const datefinstring = moment_timezone_1.default.tz(ticket === null || ticket === void 0 ? void 0 : ticket.fechafinal, "America/Mexico_City").format("YYYY-MM-DD HH:mm:ss");
         let ticketresponse = {
             id: ticket === null || ticket === void 0 ? void 0 : ticket.id,
-            fechainicio: fechainicio,
-            fechafinal: fechafin,
+            fechainicio: dateiniciostring,
+            fechafinal: datefinstring,
             nombre: ticket === null || ticket === void 0 ? void 0 : ticket.nombre,
             uuid: uuidSearch,
             total: parseFloat((_b = (_a = ticket === null || ticket === void 0 ? void 0 : ticket.total) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : "0"),

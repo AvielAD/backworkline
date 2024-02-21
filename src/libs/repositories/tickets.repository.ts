@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client"
 import { ServicioDto, cat_ticketDto, createTicketDto, ticketsDto } from "../dtos/tickets.dto"
-import moment from "moment"
+import moment from "moment-timezone"
 
 const prisma = new PrismaClient()
 
@@ -21,7 +21,7 @@ export const GetTickets = async () => {
         ticketsresponse.forEach((item, index) => {
             tickets.push({
                 id: item.id,
-                fechainicio: item.fechainicio,
+                fechainicio: moment(item.fechainicio).format(process.env.FORMAT_DATE),
                 nombre: item.nombre,
                 uuid: item.uuidsearch,
                 category: {
@@ -62,11 +62,15 @@ export const GetTicketByUUID = async(uuidSearch: string)=>{
                 includepay: item.includepay
             } as ServicioDto)
         })
+        const dateiniciostring = moment(ticket?.fechainicio).format(process.env.FORMAT_DATE)
+        const datefinstring = moment(ticket?.fechafinal).format(process.env.FORMAT_DATE)
+        
+        //America/Mexico_City
 
         let ticketresponse = {
             id : ticket?.id,
-            fechainicio : ticket?.fechainicio,
-            fechafinal: ticket?.fechafinal,
+            fechainicio : dateiniciostring.toString(),
+            fechafinal: datefinstring.toString(),
             nombre: ticket?.nombre,
             uuid: uuidSearch,
             total: parseFloat( ticket?.total?.toString() ?? "0") ,

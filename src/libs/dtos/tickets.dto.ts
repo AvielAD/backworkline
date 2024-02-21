@@ -2,8 +2,8 @@
 export interface ticketsDto{
     id: number,
     uuid: string,
-    fechainicio: Date,
-    fechafinal: Date,
+    fechainicio: string,
+    fechafinal: string,
     nombre: string,
     total: number,
     category: cat_ticketDto,

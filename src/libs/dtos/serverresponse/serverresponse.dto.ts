@@ -14,3 +14,9 @@ export interface UserInfoLogin{
     nombre: string,
     token: string,
 }
+
+export interface ServerResponseDataDto{
+    message: string,
+    succeeded: boolean,
+    data: any
+}

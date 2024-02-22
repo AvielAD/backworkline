@@ -1,5 +1,5 @@
 
-import { ServerResponseDTO } from '../dtos/serverresponse/serverresponse.dto'
+import { ServerResponseDTO, ServerResponseDataDto } from '../dtos/serverresponse/serverresponse.dto'
 import { createTicketDto } from '../dtos/tickets.dto'
 import * as CtrlRepository from '../repositories/tickets.repository'
 
@@ -33,16 +33,19 @@ export const IniciarTicket = async ( newTicket: createTicketDto)=>{
 
 export const CerrarTicket = async(uuidSearch: string)=>{
     const response = await CtrlRepository.CerrarTicket(uuidSearch)
-    if(response){
+
+    if(response !=null){
         return {
             succeeded: true,
-            message: "Ticket Cerrado Correctamente"
-        } as ServerResponseDTO
+            message: "Ticket Cerrado Correctamente",
+            data:response
+        } as ServerResponseDataDto
     }
     else{
         return {
             succeeded: false,
-            message: "Se ha presentado un problema al cerrar el ticket"
-        } as ServerResponseDTO
+            message: "Se ha presentado un problema al cerrar el ticket",
+            data: null
+        } as ServerResponseDataDto
     }
 }

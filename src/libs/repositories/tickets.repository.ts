@@ -103,6 +103,7 @@ export const IniciarTicker = async(newTicket: createTicketDto)=>{
 export const CerrarTicket = async (uuid:string) =>{
     let costotiempo:number = 0
     let costoservicios:number = 0
+    let minutosTotales 
     let serviceList = [] as Array<ServicioDto>
 
     try {
@@ -130,11 +131,13 @@ export const CerrarTicket = async (uuid:string) =>{
 
         const fechaCierre = moment().toDate()
         //calcular costo tiempo
-        if(ticket?.fechainicio !=null)
-            costotiempo = totalCostTime(ticket.fechainicio, fechaCierre, parseFloat( ticket.cat_ticket?.costohora?.toString() ?? "0"))
-        if(serviceList.length>0)
-            costoservicios= totalCostServices(serviceList)
-
+        if(ticket?.fechainicio !=null){
+            minutosTotales = totalCostTime(ticket.fechainicio, fechaCierre, parseFloat( ticket.cat_ticket?.costohora?.toString() ?? "0"))
+            costotiempo = minutosTotales.total
+            if(serviceList.length>0){
+                costoservicios= totalCostServices(serviceList)
+            }
+        }
         //calcular costo servicios
         
         const cerrar = await prisma.ticket.update({
@@ -148,9 +151,9 @@ export const CerrarTicket = async (uuid:string) =>{
             
         })
         
-        return true
+        return minutosTotales
     } catch (error) {
-        return false
+        return null
     }
 }
 
@@ -167,10 +170,15 @@ const totalCostServices = (services: Array<ServicioDto>)=>{
 
 const totalCostTime = (inicio: Date, fin: Date, costohora: number)=>{
     let totalresponse:number = 0
+    let valuesCalc = {
+        total: 0,
+        minutos: 0
+    }
     const start = moment(inicio)
     const end = moment(fin)
     const tiempototalm = moment.duration(end.diff(start))
     const minutos = tiempototalm.asMinutes()
+    
 
     if(minutos < 10)
         totalresponse= 0
@@ -181,6 +189,9 @@ const totalCostTime = (inicio: Date, fin: Date, costohora: number)=>{
     else if(minutos > 60 && minutos <= 240)
         totalresponse = costohora + ((costohora/minutos) * (minutos-60))  
 
-    return parseFloat((Math.round( totalresponse * 100) / 100).toFixed(0))
+        valuesCalc.minutos= minutos
+        valuesCalc.total= parseFloat((Math.round( totalresponse * 100) / 100).toFixed(0))
+
+    return valuesCalc
 }
 

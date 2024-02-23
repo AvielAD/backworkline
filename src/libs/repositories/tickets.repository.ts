@@ -157,6 +157,7 @@ export const CerrarTicket = async (uuid:string) =>{
     }
 }
 
+
 const totalCostServices = (services: Array<ServicioDto>)=>{
     let totalresponse:number = 0
     services.forEach((item:ServicioDto)=>{

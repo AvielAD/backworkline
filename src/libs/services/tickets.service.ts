@@ -49,21 +49,21 @@ export const UpdateTicket = async(uuidSearch: string)=>{
     if(response !=null){
         return {
             succeeded: true,
-            message: "Ticket Cerrado Correctamente",
+            message: "Ticket Actualizado Correctamente",
             data:response
         } as ServerResponseDataDto
     }
     else{
         return {
             succeeded: false,
-            message: "Se ha presentado un problema al cerrar el ticket",
+            message: "Se ha presentado un problema al actualizar el ticket",
             data: null
         } as ServerResponseDataDto
     }
 }
 
 export const CerrarTicket = async(uuidSearch: string)=>{
-    
+
     if(! await CtrlRepository.CheckEstadoTicket(uuidSearch)){
 
         return {

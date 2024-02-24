@@ -6,6 +6,7 @@ export interface ticketsDto{
     fechafinal: string,
     nombre: string,
     total: number,
+    estado: string,
     category: cat_ticketDto,
     servicios: Array<ServicioDto>
 }

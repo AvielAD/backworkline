@@ -11,6 +11,7 @@ export const GetTickets = async () => {
     try {
         //agregar ticket
         const categories = await prisma.cat_ticket.findMany()
+        const estados = await prisma.cat_estadoticket.findMany()
 
         const ticketsresponse = await prisma.ticket.findMany({
             include: {
@@ -26,6 +27,7 @@ export const GetTickets = async () => {
                 fechainicio: moment.tz(item.fechainicio, "America/Mexico_City").format("YYYY-MM-DD HH:mm:ss"),
                 nombre: item.nombre,
                 uuid: item.uuidsearch,
+                estado: estados.find(x=> x.id ==item.idestado)?.nombre,
                 category: {
                     id: item.cat_ticket?.id,
                     nombre: item.cat_ticket?.nombre
@@ -45,6 +47,7 @@ export const GetTicketByUUID = async (uuidSearch: string) => {
     let serviceList = [] as Array<ServicioDto>
     try {
         const categories = await prisma.cat_ticket.findMany()
+        const estados = await prisma.cat_estadoticket.findMany()
         const services = await prisma.cat_servicios.findMany()
 
         const ticket = await prisma.ticket.findFirst({
@@ -74,6 +77,7 @@ export const GetTicketByUUID = async (uuidSearch: string) => {
             nombre: ticket?.nombre,
             uuid: uuidSearch,
             total: parseFloat(ticket?.total?.toString() ?? "0"),
+            estado: estados.find(x => x.id== ticket?.idestado)?.nombre,
             category: {
                 id: ticket?.idcatticket,
                 nombre: categories.find(y => y.id == ticket?.idcatticket)?.nombre

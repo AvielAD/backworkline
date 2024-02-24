@@ -16,6 +16,8 @@ export const GetTicketByUUID = async(uuidSearch: string)=>{
 }
 
 export const IniciarTicket = async ( newTicket: createTicketDto)=>{
+
+
     const response = await CtrlRepository.IniciarTicker(newTicket)
     if(response){
         return {
@@ -31,7 +33,46 @@ export const IniciarTicket = async ( newTicket: createTicketDto)=>{
     }
 }
 
+export const UpdateTicket = async(uuidSearch: string)=>{
+
+    if(! await CtrlRepository.CheckEstadoTicket(uuidSearch)){
+
+        return {
+            succeeded: false,
+            message: "El ticket ya no esta siendo monitoreado",
+        } as ServerResponseDataDto
+
+    }
+
+    const response = await CtrlRepository.UpdateTicket(uuidSearch)
+
+    if(response !=null){
+        return {
+            succeeded: true,
+            message: "Ticket Cerrado Correctamente",
+            data:response
+        } as ServerResponseDataDto
+    }
+    else{
+        return {
+            succeeded: false,
+            message: "Se ha presentado un problema al cerrar el ticket",
+            data: null
+        } as ServerResponseDataDto
+    }
+}
+
 export const CerrarTicket = async(uuidSearch: string)=>{
+    
+    if(! await CtrlRepository.CheckEstadoTicket(uuidSearch)){
+
+        return {
+            succeeded: false,
+            message: "El ticket ya no esta siendo monitoreado",
+        } as ServerResponseDataDto
+
+    }
+
     const response = await CtrlRepository.CerrarTicket(uuidSearch)
 
     if(response !=null){

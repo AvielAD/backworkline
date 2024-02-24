@@ -52,6 +52,20 @@ export const CerrarTicket = async (req: Request, res: Response) => {
     }
 }
 
+export const UpdateTicket = async (req: Request, res: Response) => {
+    const uuid: string = String(req.params["uuidSearch"]) ?? ""
+
+    try {
+        const response = await CtrlService.UpdateTicket(uuid)
+        if(response.succeeded)
+            return res.status(200).json(response)
+        else
+            return res.status(404).json(response)
+
+    } catch (error) {
+        return res.status(404).json([])
+    }
+}
 export const AddServiceToTicket = async (req: Request, res: Response) => {
     const uuidSearch: string = String(req.params["uuidSearch"]) ?? ""
     try {
@@ -61,3 +75,5 @@ export const AddServiceToTicket = async (req: Request, res: Response) => {
         return res.status(404).json([])
     }
 }
+
+

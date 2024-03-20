@@ -21,21 +21,21 @@ export const GetTicketById = async (req: Request, res: Response) => {
     }
 }
 
-export const IniciarTicket = async (req: Request, res: Response) => {
-    const newTicket: createTicketDto = req.body
+    export const IniciarTicket = async (req: Request, res: Response) => {
+        const newTicket: createTicketDto = req.body
 
-    try {
+        try {
 
-        const response = await CtrlService.IniciarTicket(newTicket)
-        if(response.succeeded)
-            return res.status(200).json(response)
-        else
-            return res.status(404).json(response)
+            const response = await CtrlService.IniciarTicket(newTicket)
+            if(response.succeeded)
+                return res.status(200).json(response)
+            else
+                return res.status(404).json(response)
 
-    } catch (error) {
-        return res.status(404).json([])
+        } catch (error) {
+            return res.status(404).json([])
+        }
     }
-}
 
 export const CerrarTicket = async (req: Request, res: Response) => {
     const uuid: string = String(req.params["uuidSearch"]) ?? ""

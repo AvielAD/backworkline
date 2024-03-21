@@ -27,7 +27,7 @@ export const GetTickets = async () => {
                 fechainicio: moment.tz(item.fechainicio, "America/Mexico_City").format("YYYY-MM-DD HH:mm:ss"),
                 nombre: item.nombre,
                 uuid: item.uuidsearch,
-                estado: estados.find(x=> x.id ==item.idestado)?.nombre,
+                estado: estados.find(x => x.id == item.idestado)?.nombre,
                 category: {
                     id: item.cat_ticket?.id,
                     nombre: item.cat_ticket?.nombre
@@ -77,7 +77,7 @@ export const GetTicketByUUID = async (uuidSearch: string) => {
             nombre: ticket?.nombre,
             uuid: uuidSearch,
             total: parseFloat(ticket?.total?.toString() ?? "0"),
-            estado: estados.find(x => x.id== ticket?.idestado)?.nombre,
+            estado: estados.find(x => x.id == ticket?.idestado)?.nombre,
             category: {
                 id: ticket?.idcatticket,
                 nombre: categories.find(y => y.id == ticket?.idcatticket)?.nombre
@@ -175,21 +175,25 @@ export const CerrarTicket = async (uuidSerach: string) => {
         const diftime = datefinal.diff(dateinicio, ["minutes"])
         //mas de 10 minutos ticket finalizado
         let nuevoEstado = 1
-        if(diftime.minutes <= 10)
-            nuevoEstado=2
-        if(diftime.minutes > 10)
-            nuevoEstado=3
+        if (diftime.minutes <= 10)
+            nuevoEstado = 2
+        if (diftime.minutes > 10)
+            nuevoEstado = 3
         const updateTicket = await prisma.ticket.update({
             where: {
                 id: ticketsearch?.id
             },
-            data:{
+            data: {
                 idestado: nuevoEstado
             }
         })
+        //aplicar descuento a ticket desde codigo agregado
+        if(ticketsearch?.id)
+            await ApplicarDescuento(ticketsearch.id)
+
         return true
     } catch (error) {
-        
+
         console.log(error)
         return false
     }
@@ -253,4 +257,101 @@ const totalCostTime = (inicio: Date, fin: Date, costohora: number) => {
 
     return valuesCalc
 }
+const ApplicarDescuento = async (idticket: number) => {
+    try {
+        const ticket = await prisma.ticket.findFirst({
+            where: {
+                id: idticket
+            }
+        })
 
+        if (ticket != null) {
+            let codigo = await prisma.codigodescuento.findFirst({
+                where: {
+                    id: ticket.idcodigo ?? 0
+                }
+            })
+            if (codigo != null) {
+                let totalactual = parseFloat(ticket.total?.toString() ?? "0")
+                let descuento = parseFloat(codigo?.descuento?.toString() ?? "0")
+                //restar porcentaje de descuento al total del costo actual
+                let totalnew = totalactual - ((totalactual / 100) * descuento)
+
+                let ticketupdate = await prisma.ticket.update({
+                    where: {
+                        id: idticket
+                    },
+                    data: {
+                        total: totalnew
+                    }
+                })
+            }
+        }
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
+export const AssignarDescuento = async (idticket: number, uuidticket: string) => {
+    try {
+        const codigo = await prisma.codigodescuento.findFirst({
+            where:{
+                uuidkey: uuidticket
+            }
+        })
+
+        const ticket = await prisma.ticket.update({
+            where: {
+                id: idticket
+            },
+            data: {
+                idcodigo: codigo?.id
+            }
+        })
+
+        if(codigo?.idcatcodigo== 1){
+            await prisma.codigodescuento.update({
+                where:{
+                    id: codigo.id
+                },
+                data:{
+                    replicas: ((codigo.replicas??0) - 1),
+                    terminado: true
+                }
+            })
+        return true
+
+        }
+        else if(codigo?.idcatcodigo == 2 && codigo.terminado == false){
+            await prisma.codigodescuento.update({
+                where:{
+                    id:codigo.id
+                },
+                data:{
+                    replicas: ((codigo.replicas??0) - 1),
+                    terminado: true
+                }
+            })
+        return true
+
+        }
+        else if(codigo?.idcatcodigo == 2 && codigo.terminado == null){
+            await prisma.codigodescuento.update({
+                where:{
+                    id:codigo.id
+                },
+                data:{
+                    replicas: ((codigo.replicas??0) - 1),
+                    terminado: false
+                }
+            })
+        return true
+
+        }
+
+        return false
+    } catch (error) {
+        return false
+    }
+}

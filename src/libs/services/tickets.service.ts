@@ -90,3 +90,29 @@ export const CerrarTicket = async(uuidSearch: string)=>{
         } as ServerResponseDataDto
     }
 }
+
+export const ApplicarDescuento = async (idticket:number, uuidkey:string)=>{
+
+    //verificar si el codigo aun es valido por fecha
+
+    //verificar si el codigo aun es valido por instancias
+
+    //verificar si el codigo aun es valido al aun no ser aplicado (daypass)
+
+    const response = await CtrlRepository.AssignarDescuento(idticket,uuidkey)
+
+    if(response !=null){
+        return {
+            succeeded: true,
+            message: "Codigo descuento aplicado correctamente",
+            data:response
+        } as ServerResponseDataDto
+    }
+    else{
+        return {
+            succeeded: false,
+            message: "Se presento un problema al aplicar el codigo de descuento",
+            data: null
+        } as ServerResponseDataDto
+    }
+}

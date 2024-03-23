@@ -110,7 +110,7 @@ export const ApplicarDescuento = async (assigncode: assigncode)=>{
     if(!await CtrlRepository.codigoValidoInstancia(assigncode.idcodigouuid)){
         return {
             succeeded: false,
-            message: "Codigo no disponible",
+            message: "Codigo ya fue aplicado a otro ticket",
         } as ServerResponseDataDto
     }
     //verificar si el codigo aun es valido al aun no ser aplicado (daypass)

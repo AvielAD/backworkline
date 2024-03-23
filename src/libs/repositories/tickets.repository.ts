@@ -259,7 +259,7 @@ const totalCostTime = (inicio: Date, fin: Date, costohora: number) => {
 }
 const ApplicarDescuento = async (idticket: number) => {
     try {
-        const ticket = await prisma.ticket.findFirst({
+        const ticket = await prisma.ticket.findFirstOrThrow({
             where: {
                 id: idticket
             }

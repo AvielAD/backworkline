@@ -355,3 +355,62 @@ export const AssignarDescuento = async (idticket: number, uuidticket: string) =>
         return false
     }
 }
+
+export const codigoisValidFecha = async (idcodigouuid: string)=>{
+    try {
+        const codigo = await prisma.codigodescuento.findFirstOrThrow({
+            where:{
+                uuidkey: idcodigouuid
+            }
+        })
+
+        if(codigo!= null){
+            let fechaactual = DateTime.fromISO( DateTime.now().toString())
+            let fechacodigo = DateTime.fromISO(codigo.fechavigencia?.toISOString() ?? "2000-01-01")
+            if(fechacodigo >= fechaactual){
+                return true
+            }
+        }
+        return false
+
+    } catch (error) {
+        return false
+    }
+}
+
+export const codigoValidoInstancia = async (idcodigouuid: string)=>{
+    try {
+        const codigo = await prisma.codigodescuento.findFirstOrThrow({
+            where:{
+                uuidkey: idcodigouuid
+            }
+        })
+
+        if(codigo!= null){
+            let replicas = parseInt(codigo.replicas?.toString() ?? "0")
+            if(replicas > 0){
+                return true
+            }
+        }
+        return false
+
+    } catch (error) {
+        return false
+    }
+}
+
+export const ticketHaveCode= async (idticket: number)=>{
+    try {
+        let ticket = await prisma.ticket.findFirstOrThrow({
+            where:{
+                id: idticket
+            }
+        })
+        if(ticket.idcodigo != null)
+            return true
+        else
+            return false
+    } catch (error) {
+        return false
+    }
+}

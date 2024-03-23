@@ -1,6 +1,6 @@
 
 import { ServerResponseDTO, ServerResponseDataDto } from '../dtos/serverresponse/serverresponse.dto'
-import { createTicketDto } from '../dtos/tickets.dto'
+import { assigncode, createTicketDto } from '../dtos/tickets.dto'
 import * as CtrlRepository from '../repositories/tickets.repository'
 
 export const GetTickets = async ()=>{
@@ -91,28 +91,42 @@ export const CerrarTicket = async(uuidSearch: string)=>{
     }
 }
 
-export const ApplicarDescuento = async (idticket:number, uuidkey:string)=>{
+export const ApplicarDescuento = async (assigncode: assigncode)=>{
 
+    if(await CtrlRepository.ticketHaveCode(assigncode.idticket)){
+        return {
+            succeeded: false,
+            message: "El ticket ya cuenta con un descuento aplicado",
+        } as ServerResponseDataDto
+    }
     //verificar si el codigo aun es valido por fecha
-
+    if(!await CtrlRepository.codigoisValidFecha(assigncode.idcodigouuid)){
+        return {
+            succeeded: false,
+            message: "Codigo Vencido",
+        } as ServerResponseDataDto
+    }
     //verificar si el codigo aun es valido por instancias
-
+    if(!await CtrlRepository.codigoValidoInstancia(assigncode.idcodigouuid)){
+        return {
+            succeeded: false,
+            message: "Codigo no disponible",
+        } as ServerResponseDataDto
+    }
     //verificar si el codigo aun es valido al aun no ser aplicado (daypass)
 
-    const response = await CtrlRepository.AssignarDescuento(idticket,uuidkey)
+    const response = await CtrlRepository.AssignarDescuento(assigncode.idticket,assigncode.idcodigouuid)
 
     if(response !=null){
         return {
             succeeded: true,
             message: "Codigo descuento aplicado correctamente",
-            data:response
         } as ServerResponseDataDto
     }
     else{
         return {
             succeeded: false,
             message: "Se presento un problema al aplicar el codigo de descuento",
-            data: null
         } as ServerResponseDataDto
     }
 }

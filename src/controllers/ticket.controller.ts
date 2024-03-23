@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import * as CtrlService from '../libs/services/tickets.service'
-import { createTicketDto } from "../libs/dtos/tickets.dto"
+import { assigncode, createTicketDto } from "../libs/dtos/tickets.dto"
 
 export const GetTickets = async (req: Request, res: Response) => {
     try {
@@ -75,5 +75,14 @@ export const AddServiceToTicket = async (req: Request, res: Response) => {
         return res.status(404).json([])
     }
 }
+
+export const AplicarCodigo = async (req: Request, res: Response)=>{
+    const assigncode : assigncode = req.body
+    const response = await CtrlService.ApplicarDescuento(assigncode)
+    if(response.succeeded)
+        return res.status(200).json(response)
+    else
+        return res.status(400).json(response)
+}   
 
 

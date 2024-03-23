@@ -28,5 +28,8 @@ export interface ServicioDto{
     includepay: boolean
 }
 
-
+export interface assigncode{
+    idcodigouuid: string,
+    idticket: number
+}
 

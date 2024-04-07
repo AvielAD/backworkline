@@ -92,7 +92,6 @@ export const CerrarTicket = async(uuidSearch: string)=>{
 }
 
 export const ApplicarDescuento = async (assigncode: assigncode)=>{
-
     if(await CtrlRepository.ticketHaveCode(assigncode.idticket)){
         return {
             succeeded: false,

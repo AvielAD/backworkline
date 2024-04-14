@@ -35,6 +35,7 @@ export const AddCompraCaja = async(newServicio: compradto)=>{
 
         return true
     } catch (error) {
+        console.log(error)
         return false
     }
 }

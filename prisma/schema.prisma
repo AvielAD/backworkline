@@ -23,14 +23,16 @@ model cat_ticket {
   ticket             ticket[]
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model servicio_ticket {
   idticket      Int
   idcatservicio Int
   includepay    Boolean?      @default(false)
+  id            Int           @default(autoincrement())
   cat_servicios cat_servicios @relation(fields: [idcatservicio], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_servicioticket_servicio")
   ticket        ticket        @relation(fields: [idticket], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_servicioticket_ticket")
 
-  @@id([idticket, idcatservicio])
+  @@id([id, idcatservicio, idticket])
 }
 
 model ticket {

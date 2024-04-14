@@ -11,7 +11,7 @@ export const AddCompraCaja = async(newServicio: compradto)=>{
         //agregar ticket
         const newTicket = await prisma.ticket.create({
             data:{
-                nombre: DateTime.now().toLocaleString(DateTime.TIME_SIMPLE),
+                nombre: "Venta General",
                 idcatticket: 3,//Compra,
                 idestado: 3,//finalizado,
                 fechafinal: DateTime.now().toString()
@@ -31,6 +31,7 @@ export const AddCompraCaja = async(newServicio: compradto)=>{
 
         //efectuar calculo para los servicios asignados al nuevo ticket
         await CtrlCostos.CalcularCostoServicios(newTicket.id)
+        await CtrlCostos.CalcularTotal(newTicket.id)
 
         return true
     } catch (error) {

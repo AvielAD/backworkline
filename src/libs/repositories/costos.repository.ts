@@ -7,7 +7,7 @@ const prisma = new PrismaClient()
 export const CalcularCostoServicios = async (idticket: number)=>{
     try {
         //buscar ticket
-        var ticket = await prisma.ticket.findFirst({
+        var ticket = await prisma.ticket.findFirstOrThrow({
             where:{
                 id: idticket
             }
@@ -42,4 +42,32 @@ export const CalcularCostoServicios = async (idticket: number)=>{
     }
 
 
+}
+
+export const CalcularTotal = async (idticket:number)=>{
+    try {
+        
+        const ticket = await prisma.ticket.findFirstOrThrow({
+            where:{
+                id: idticket
+            }
+        })
+
+        const costoTiempo = parseFloat(ticket.totalcostotiempo?.toString() ?? "0")
+        const costoServicios = parseFloat(ticket.totalcostoservicios?.toString() ?? "0")
+        const costoDescuento = parseFloat(ticket.totaldescuento?.toString() ?? "0")
+
+        const updateTicket = await prisma.ticket.update({
+            where:{
+                id: idticket
+            },
+            data:{
+                total: (costoTiempo+costoServicios - costoDescuento)
+            }
+        })
+
+        return true
+    } catch (error) {
+        return false
+    }
 }

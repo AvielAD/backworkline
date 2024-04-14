@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client"
 import { servicioinputfulldto } from "../dtos/tickets.dto"
 import { compradto } from "../dtos/caja.dto"
 import { DateTime } from "luxon"
-
+import * as CtrlCostos from './costos.repository'
 const prisma = new PrismaClient()
 
 
@@ -22,7 +22,7 @@ export const AddCompraCaja = async(newServicio: compradto)=>{
         let newServicios = [] as Array<servicioinputfulldto>
 
         newServicio.servicios.forEach(element => {
-            newServicios = [...newServicios, {idticket: newTicket.id, idcatservicio: element}]
+            newServicios = [...newServicios, {idticket: newTicket.id, idcatservicio: element, includepay:false}]
         });
 
         const response = await prisma.servicio_ticket.createMany({
@@ -30,6 +30,7 @@ export const AddCompraCaja = async(newServicio: compradto)=>{
         })
 
         //efectuar calculo para los servicios asignados al nuevo ticket
+        await CtrlCostos.CalcularCostoServicios(newTicket.id)
 
         return true
     } catch (error) {

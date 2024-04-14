@@ -8,17 +8,19 @@ datasource db {
 }
 
 model cat_servicios {
-  id              Int               @id @default(autoincrement())
-  nombre          String?           @db.VarChar(256)
-  costo           Decimal?          @db.Money
-  servicio_ticket servicio_ticket[]
+  id                 Int                  @id @default(autoincrement())
+  nombre             String?              @db.VarChar(256)
+  costo              Decimal?             @db.Money
+  catticket_servicio catticket_servicio[]
+  servicio_ticket    servicio_ticket[]
 }
 
 model cat_ticket {
-  id        Int      @id @default(autoincrement())
-  nombre    String?  @db.VarChar(256)
-  costohora Decimal? @db.Money
-  ticket    ticket[]
+  id                 Int                  @id @default(autoincrement())
+  nombre             String?              @db.VarChar(256)
+  costohora          Decimal?             @db.Money
+  catticket_servicio catticket_servicio[]
+  ticket             ticket[]
 }
 
 model servicio_ticket {
@@ -32,19 +34,22 @@ model servicio_ticket {
 }
 
 model ticket {
-  id               Int               @id @default(autoincrement())
-  fechainicio      DateTime?         @default(now()) @db.Timestamptz(6)
-  fechafinal       DateTime?         @db.Timestamptz(6)
-  nombre           String?           @db.VarChar(255)
-  idcatticket      Int?
-  total            Decimal?          @db.Money
-  uuidsearch       String            @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  idestado         Int?              @default(1)
-  idcodigo         Int?
-  servicio_ticket  servicio_ticket[]
-  cat_ticket       cat_ticket?       @relation(fields: [idcatticket], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ticket_catticket")
-  codigodescuento  codigodescuento?  @relation(fields: [idcodigo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ticket_codigo")
-  cat_estadoticket cat_estadoticket? @relation(fields: [idestado], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ticket_estadoticket")
+  id                  Int               @id @default(autoincrement())
+  fechainicio         DateTime?         @default(now()) @db.Timestamptz(6)
+  fechafinal          DateTime?         @db.Timestamptz(6)
+  nombre              String?           @db.VarChar(255)
+  idcatticket         Int?
+  total               Decimal?          @default(0) @db.Money
+  uuidsearch          String            @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  idestado            Int?              @default(1)
+  idcodigo            Int?
+  totalcostotiempo    Decimal?          @default(0) @db.Money
+  totalcostoservicios Decimal?          @default(0) @db.Money
+  totaldescuento      Decimal?          @default(0) @db.Money
+  servicio_ticket     servicio_ticket[]
+  cat_ticket          cat_ticket?       @relation(fields: [idcatticket], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ticket_catticket")
+  codigodescuento     codigodescuento?  @relation(fields: [idcodigo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ticket_codigo")
+  cat_estadoticket    cat_estadoticket? @relation(fields: [idestado], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ticket_estadoticket")
 }
 
 model cat_estadoticket {
@@ -68,7 +73,16 @@ model codigodescuento {
   replicas      Int?
   terminado     Boolean?
   idcatcodigo   Int?
-  descuento     Decimal?     @db.Money
+  descuento     Decimal?     @db.Decimal
   cat_codigod   cat_codigod? @relation(fields: [idcatcodigo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_codigod_catcodigo")
   ticket        ticket[]
+}
+
+model catticket_servicio {
+  idcatticket   Int
+  idcatservicio Int
+  cat_servicios cat_servicios @relation(fields: [idcatservicio], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_catts_cs")
+  cat_ticket    cat_ticket    @relation(fields: [idcatticket], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_catts_ct")
+
+  @@id([idcatticket, idcatservicio])
 }

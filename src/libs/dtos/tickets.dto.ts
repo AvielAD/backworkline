@@ -35,6 +35,7 @@ export interface servicioinputdto{
 export interface servicioinputfulldto{
     idticket: number,
     idcatservicio: number
+    includepay: boolean
 }
 export interface assigncode{
     idcodigouuid: string,

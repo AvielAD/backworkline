@@ -11,8 +11,11 @@ RUN npm install
 # RUN npm ci --omit=dev
 # Bundle app source
 COPY . .
+#TimeZone
+RUN apk add --no-cache tzdata
+ENV TZ=America/Mexico_City
+
 #Prisma client
-ENV TZ="America/Mexico_City"
 RUN npx prisma generate
 RUN npm run build
 EXPOSE 3000

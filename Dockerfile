@@ -12,6 +12,7 @@ RUN npm install
 # Bundle app source
 COPY . .
 #Prisma client
+ENV TZ="America/Mexico_City"
 RUN npx prisma generate
 RUN npm run build
 EXPOSE 3000

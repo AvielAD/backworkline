@@ -1,6 +1,5 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -88,16 +87,4 @@ model catticket_servicio {
   cat_ticket    cat_ticket    @relation(fields: [idcatticket], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_catts_ct")
 
   @@id([idcatticket, idcatservicio])
-}
-
-view ticketview {
-  id               Int      @unique
-  fechainicio      DateTime? @db.Timestamptz(6)
-  fechafinal       DateTime? @db.Timestamptz(6)
-  nombre           String?   @db.VarChar(255)
-  uuidsearch       String?   @db.Uuid
-  idcategory       Int?
-  idcategorynombre String?   @db.VarChar(256)
-  idestadonombre   String?   @db.VarChar(100)
-
 }

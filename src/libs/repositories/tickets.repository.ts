@@ -5,25 +5,40 @@ import { CatEstadoTicket } from "../enums/tickets.enum"
 import { DateTime } from 'luxon'
 const prisma = new PrismaClient()
 
+const isEqualDateNow = (fechaInicio: Date | null) =>{
+    const FechaInicio = fechaInicio?.toISOString() ?? DateTime.now().toString()
+    let fechaComparar = DateTime.fromISO(FechaInicio)
+    let fechaHoy = DateTime.now()
+    return fechaComparar.toLocaleString(DateTime.DATE_SHORT) == fechaHoy.toLocaleString(DateTime.DATE_SHORT)
+}
+
 export const GetTickets = async () => {
     let tickets = [] as Array<ticketsDto>
 
     try {
         //agregar ticket
-        const ticketview = await prisma.ticketview.findMany()
+        const ticketview = await prisma.ticket.findMany({
+            include: {
+                cat_estadoticket: true,
+                cat_ticket: true
+            }
+        })
+
         //calcular total consumido en servicios
 
-        ticketview.forEach((item, index) => {
+        let ticketsall = ticketview.filter(x => isEqualDateNow(x.fechainicio))
+        
+        ticketsall.forEach((item, index) => {
 
             tickets.push({
                 id: item.id,
-                fechainicio: moment.tz(item.fechainicio, "America/Mexico_City").format("YYYY-MM-DD HH:mm:ss"),
+                fechainicio: item.fechainicio?.toString(),
                 nombre: item.nombre,
                 uuid: item.uuidsearch,
-                estado: item.idestadonombre,
+                estado: item.cat_estadoticket?.nombre,
                 category: {
-                    id: item.idcategory,
-                    nombre: item.idcategorynombre
+                    id: item.cat_ticket?.id,
+                    nombre: item.cat_ticket?.nombre
                 } as cat_ticketDto,
             } as ticketsDto)
 
@@ -35,6 +50,7 @@ export const GetTickets = async () => {
         return []
     }
 }
+
 
 export const GetTicketByUUID = async (uuidSearch: string) => {
     let serviceList = [] as Array<ServicioDto>
@@ -181,7 +197,7 @@ export const CerrarTicket = async (uuidSerach: string) => {
             }
         })
         //aplicar descuento a ticket desde codigo agregado
-        if(ticketsearch?.id)
+        if (ticketsearch?.id)
             await ApplicarDescuento(ticketsearch.id)
 
         return true
@@ -289,7 +305,7 @@ const ApplicarDescuento = async (idticket: number) => {
 export const AssignarDescuento = async (idticket: number, uuidticket: string) => {
     try {
         const codigo = await prisma.codigodescuento.findFirst({
-            where:{
+            where: {
                 uuidkey: uuidticket
             }
         })
@@ -303,43 +319,43 @@ export const AssignarDescuento = async (idticket: number, uuidticket: string) =>
             }
         })
 
-        if(codigo?.idcatcodigo== 1){
+        if (codigo?.idcatcodigo == 1) {
             await prisma.codigodescuento.update({
-                where:{
+                where: {
                     id: codigo.id
                 },
-                data:{
-                    replicas: ((codigo.replicas??0) - 1),
+                data: {
+                    replicas: ((codigo.replicas ?? 0) - 1),
                     terminado: true
                 }
             })
-        return true
+            return true
 
         }
-        else if(codigo?.idcatcodigo == 2 && codigo.terminado == false){
+        else if (codigo?.idcatcodigo == 2 && codigo.terminado == false) {
             await prisma.codigodescuento.update({
-                where:{
-                    id:codigo.id
+                where: {
+                    id: codigo.id
                 },
-                data:{
-                    replicas: ((codigo.replicas??0) - 1),
+                data: {
+                    replicas: ((codigo.replicas ?? 0) - 1),
                     terminado: true
                 }
             })
-        return true
+            return true
 
         }
-        else if(codigo?.idcatcodigo == 2 && codigo.terminado == null){
+        else if (codigo?.idcatcodigo == 2 && codigo.terminado == null) {
             await prisma.codigodescuento.update({
-                where:{
-                    id:codigo.id
+                where: {
+                    id: codigo.id
                 },
-                data:{
-                    replicas: ((codigo.replicas??0) - 1),
+                data: {
+                    replicas: ((codigo.replicas ?? 0) - 1),
                     terminado: false
                 }
             })
-        return true
+            return true
 
         }
 
@@ -349,18 +365,18 @@ export const AssignarDescuento = async (idticket: number, uuidticket: string) =>
     }
 }
 
-export const codigoisValidFecha = async (idcodigouuid: string)=>{
+export const codigoisValidFecha = async (idcodigouuid: string) => {
     try {
         const codigo = await prisma.codigodescuento.findFirstOrThrow({
-            where:{
+            where: {
                 uuidkey: idcodigouuid
             }
         })
 
-        if(codigo!= null){
-            let fechaactual = DateTime.fromISO( DateTime.now().toString())
+        if (codigo != null) {
+            let fechaactual = DateTime.fromISO(DateTime.now().toString())
             let fechacodigo = DateTime.fromISO(codigo.fechavigencia?.toISOString() ?? "2000-01-01")
-            if(fechacodigo >= fechaactual){
+            if (fechacodigo >= fechaactual) {
                 return true
             }
         }
@@ -371,17 +387,17 @@ export const codigoisValidFecha = async (idcodigouuid: string)=>{
     }
 }
 
-export const codigoValidoInstancia = async (idcodigouuid: string)=>{
+export const codigoValidoInstancia = async (idcodigouuid: string) => {
     try {
         const codigo = await prisma.codigodescuento.findFirstOrThrow({
-            where:{
+            where: {
                 uuidkey: idcodigouuid
             }
         })
 
-        if(codigo!= null){
+        if (codigo != null) {
             let replicas = parseInt(codigo.replicas?.toString() ?? "0")
-            if(replicas > 0){
+            if (replicas > 0) {
                 return true
             }
         }
@@ -392,14 +408,14 @@ export const codigoValidoInstancia = async (idcodigouuid: string)=>{
     }
 }
 
-export const ticketHaveCode= async (idticket: number)=>{
+export const ticketHaveCode = async (idticket: number) => {
     try {
         let ticket = await prisma.ticket.findFirstOrThrow({
-            where:{
+            where: {
                 id: idticket
             }
         })
-        if(ticket.idcodigo != null)
+        if (ticket.idcodigo != null)
             return true
         else
             return false

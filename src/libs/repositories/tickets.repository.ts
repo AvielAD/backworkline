@@ -10,27 +10,20 @@ export const GetTickets = async () => {
 
     try {
         //agregar ticket
-        const categories = await prisma.cat_ticket.findMany()
-        const estados = await prisma.cat_estadoticket.findMany()
-
-        const ticketsresponse = await prisma.ticket.findMany({
-            include: {
-                cat_ticket: true,
-            }
-        })
+        const ticketview = await prisma.ticketview.findMany()
         //calcular total consumido en servicios
 
-        ticketsresponse.forEach((item, index) => {
+        ticketview.forEach((item, index) => {
 
             tickets.push({
                 id: item.id,
                 fechainicio: moment.tz(item.fechainicio, "America/Mexico_City").format("YYYY-MM-DD HH:mm:ss"),
                 nombre: item.nombre,
                 uuid: item.uuidsearch,
-                estado: estados.find(x => x.id == item.idestado)?.nombre,
+                estado: item.idestadonombre,
                 category: {
-                    id: item.cat_ticket?.id,
-                    nombre: item.cat_ticket?.nombre
+                    id: item.idcategory,
+                    nombre: item.idcategorynombre
                 } as cat_ticketDto,
             } as ticketsDto)
 
